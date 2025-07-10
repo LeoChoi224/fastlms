@@ -5,10 +5,18 @@ import com.zerobase.fastlms.member.entity.Member;
 import com.zerobase.fastlms.member.model.MemberInput;
 import com.zerobase.fastlms.member.repository.MemberRepository;
 import com.zerobase.fastlms.member.service.MemberService;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,19 +39,22 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
 
+        String encodedPassword = BCrypt.hashpw(parameter.getPassword(), BCrypt.gensalt());
+
+
+
         String uuid = UUID.randomUUID().toString();
 
-        Member member = Member.builder()
+        memberRepository.save(Member.builder()
                 .userId(parameter.getUserId())
                 .userName(parameter.getUserName())
                 .phone(parameter.getPhone())
-                .password(parameter.getPassword())
+                .password(encodedPassword)
                 .regDt(LocalDateTime.now())
                 .emailAuthYn(false)
                 .emailAuthKey(uuid)
-                .build();
-
-        memberRepository.save(member);
+                .build()
+        );
 
         String email = parameter.getUserId();
         String subject = "fastums 사이트 가입을 축하드립니다. ";
@@ -68,5 +79,21 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
 
         return true;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        Optional<Member> optionalMember = memberRepository.findById(username);
+        if (!optionalMember.isPresent()) {
+            throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
+        }
+
+        Member member = optionalMember.get();
+
+        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        return new User(member.getUserId(), member.getPassword(),grantedAuthorities);
     }
 }

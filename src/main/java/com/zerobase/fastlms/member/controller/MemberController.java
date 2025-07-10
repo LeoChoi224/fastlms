@@ -17,6 +17,12 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @RequestMapping("/login")
+    public String login() {
+
+        return "member/login";
+    }
+
     @GetMapping("/register")
     public String register() {
         return "member/register";
@@ -54,4 +60,11 @@ public class MemberController {
 
         return "member/email_auth";
     }
+
+    @GetMapping("/info")
+    public String memberInfo() {
+
+        return "member/info";
+    }
+
 }
