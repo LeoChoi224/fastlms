@@ -7,7 +7,6 @@ import com.zerobase.fastlms.member.model.MemberInput;
 import com.zerobase.fastlms.member.model.ResetPasswordInput;
 import com.zerobase.fastlms.member.repository.MemberRepository;
 import com.zerobase.fastlms.member.service.MemberService;
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -44,7 +43,6 @@ public class MemberServiceImpl implements MemberService {
         String encodedPassword = BCrypt.hashpw(parameter.getPassword(), BCrypt.gensalt());
 
 
-
         String uuid = UUID.randomUUID().toString();
 
         memberRepository.save(Member.builder()
@@ -61,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
         String email = parameter.getUserId();
         String subject = "[fastums] 사이트 가입을 축하드립니다. ";
         String text = "<p>[fastums] 사이트 가입을 축하드립니다.</p><p>아래 링크를 클릭하셔서 가입을 완료 하세요. </p>"
-                + "<div><a target='_blank' href='http://localhost:8080/member/email-auth?id=" + uuid + "> 가입 완료 </a></div>";
+                + "<div><a target='_blank' href='http://localhost:8080/member/email_auth?id=" + uuid + "> 가입 완료 </a></div>";
         mailComponents.sendMail(email, subject, text);
 
         return true;
@@ -109,6 +107,56 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public boolean resetPassword(String uuid, String password) {
+
+        Optional<Member> optionalMember = memberRepository.findByResetPasswordKey(uuid);
+        if (!optionalMember.isPresent()) {
+            throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
+        }
+
+        Member member = optionalMember.get();
+
+        // 초기화 날짜가 유효한지 체크
+        if (member.getResetPasswordLimitDt() == null) {
+            throw new RuntimeException("유효한 날짜가 아닙니다.");
+        }
+
+        if (member.getResetPasswordLimitDt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("유효한 날짜가 아닙니다.");
+        }
+
+        String encPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        member.setResetPasswordKey(encPassword);
+        member.setResetPasswordKey("");
+        member.setResetPasswordLimitDt(null);
+        memberRepository.save(member);
+
+        return true;
+    }
+
+    @Override
+    public boolean checkResetPassword(String uuid) {
+
+        Optional<Member> optionalMember = memberRepository.findByResetPasswordKey(uuid);
+        if (!optionalMember.isPresent()) {
+            return  false;
+        }
+
+        Member member = optionalMember.get();
+
+        // 초기화 날짜가 유효한지 체크
+        if (member.getResetPasswordLimitDt() == null) {
+            throw new RuntimeException("유효한 날짜가 아닙니다.");
+        }
+
+        if (member.getResetPasswordLimitDt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("유효한 날짜가 아닙니다.");
+        }
+
+        return true;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         Optional<Member> optionalMember = memberRepository.findById(username);
@@ -125,6 +173,6 @@ public class MemberServiceImpl implements MemberService {
         List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        return new User(member.getUserId(), member.getPassword(),grantedAuthorities);
+        return new User(member.getUserId(), member.getPassword(), grantedAuthorities);
     }
 }
