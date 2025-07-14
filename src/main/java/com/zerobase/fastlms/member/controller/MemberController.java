@@ -67,10 +67,10 @@ public class MemberController {
     // https://www.naver.com/cafe/detail.do?id=1111
     // https://www.naver.com/cafe/detail.do?id=2222
 
-    @GetMapping("/email-auth")
+    @GetMapping("/email_auth")
     public String emailAuth(Model model, HttpServletRequest request) {
 
-        String uuid = request.getParameter("id");
+        String uuid = request.getParameter("uuid");
         System.out.println(uuid);
 
         boolean result = memberService.emailAuth(uuid);

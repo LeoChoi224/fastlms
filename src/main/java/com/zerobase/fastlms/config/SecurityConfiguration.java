@@ -5,59 +5,77 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final MemberService memberService;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserAuthenticationFailureHandler failureHandler() {
+    UserAuthenticationFailureHandler getFailureHandler() {
         return new UserAuthenticationFailureHandler();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
                                 "/member/register",
-                                "/member/email-auth",
+                                "/member/login",
+                                "/member/email_auth",
                                 "/member/find/password",
-                                "/member/reset/password").permitAll()
-                        .anyRequest().authenticated()
+                                "/member/reset/password"
+                        ).permitAll().anyRequest().authenticated()
                 )
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/admin/**")
+//                        .hasAuthority("ROLE_ADMIN")
+//                )
                 .formLogin(form -> form
                         .loginPage("/member/login")
-                        .failureHandler(failureHandler())  // 💡 Bean 호출
+                        .usernameParameter("userId")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/", true)
+                        .failureHandler(getFailureHandler())
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/member/logout")
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
-                );
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/error/denied")
+                )
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable());
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+
+        authBuilder
+                .userDetailsService(memberService)
+                .passwordEncoder(passwordEncoder());
+
+        return authBuilder.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

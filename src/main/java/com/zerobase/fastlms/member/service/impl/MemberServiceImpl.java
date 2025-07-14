@@ -8,6 +8,7 @@ import com.zerobase.fastlms.member.model.ResetPasswordInput;
 import com.zerobase.fastlms.member.repository.MemberRepository;
 import com.zerobase.fastlms.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,7 +43,6 @@ public class MemberServiceImpl implements MemberService {
 
         String encodedPassword = BCrypt.hashpw(parameter.getPassword(), BCrypt.gensalt());
 
-
         String uuid = UUID.randomUUID().toString();
 
         memberRepository.save(Member.builder()
@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
         String email = parameter.getUserId();
         String subject = "[fastums] 사이트 가입을 축하드립니다. ";
         String text = "<p>[fastums] 사이트 가입을 축하드립니다.</p><p>아래 링크를 클릭하셔서 가입을 완료 하세요. </p>"
-                + "<div><a target='_blank' href='http://localhost:8080/member/email_auth?id=" + uuid + "> 가입 완료 </a></div>";
+                + "<div><a target='_blank' href='http://localhost:8080/member/email_auth?uuid=" + uuid + "'> 가입 완료 </a></div>";
         mailComponents.sendMail(email, subject, text);
 
         return true;
@@ -69,11 +69,16 @@ public class MemberServiceImpl implements MemberService {
     public boolean emailAuth(String uuid) {
 
         Optional<Member> optionalMember = memberRepository.findByEmailAuthKey(uuid);
-        if (optionalMember.isPresent()) {
+        if (!optionalMember.isPresent()) {
             return false;
         }
 
         Member member = optionalMember.get();
+
+        if (member.isEmailAuthYn()) {
+            return false;
+        }
+
         member.setEmailAuthYn(true);
         member.setEmailAuthDt(LocalDateTime.now());
         memberRepository.save(member);
@@ -100,7 +105,7 @@ public class MemberServiceImpl implements MemberService {
         String email = parameter.getUserId();
         String subject = "[fastums] 비밀번호 초기화 메일입니다. ";
         String text = "<p>[fastums] 비밀번호 초기화 메일입니다. </p><p>아래 링크를 클릭하셔서 비밀번호를 초기화 하세요. </p>"
-                + "<div><a target='_blank' href='http://localhost:8080/member/reset/password?id=" + uuid + "> 비밀번호 초기화 링크 </a></div>";
+                + "<div><a target='_blank' href='http://localhost:8080/member/reset/password?id=" + uuid + "'> 비밀번호 초기화 링크 </a></div>";
         mailComponents.sendMail(email, subject, text);
 
         return true;
@@ -139,7 +144,7 @@ public class MemberServiceImpl implements MemberService {
 
         Optional<Member> optionalMember = memberRepository.findByResetPasswordKey(uuid);
         if (!optionalMember.isPresent()) {
-            return  false;
+            return false;
         }
 
         Member member = optionalMember.get();
@@ -170,8 +175,12 @@ public class MemberServiceImpl implements MemberService {
             throw new MemberNotEmailAuthException("이메일 활성화 이후에 로그인을 해주세요.");
         }
 
-        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        if (member.isAdminYn()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
 
         return new User(member.getUserId(), member.getPassword(), grantedAuthorities);
     }

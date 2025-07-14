@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 public class Member {
+
     @Id
     private String userId;
 
@@ -29,5 +30,7 @@ public class Member {
 
     private String resetPasswordKey;
     private LocalDateTime resetPasswordLimitDt;
+
+    private boolean adminYn;
 
 }
