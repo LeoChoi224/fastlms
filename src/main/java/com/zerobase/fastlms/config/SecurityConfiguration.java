@@ -34,9 +34,11 @@ public class SecurityConfiguration {
                                 "/member/login",
                                 "/member/email_auth",
                                 "/member/find/password",
-                                "/member/reset/password"
+                                "/member/reset/password",
+                                "admin/**" // 오류 해결시 지움
                         ).permitAll().anyRequest().authenticated()
                 )
+                // todo 오류 해결해야함!
 //                .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/admin/**")
 //                        .hasAuthority("ROLE_ADMIN")
