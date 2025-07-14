@@ -1,25 +1,82 @@
 <!doctype html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" xmlns:th="http://www.thymeleaf.org">
+    <meta charset="UTF-8">
     <title>관리자 화면</title>
+    <style>
+        .lsit table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .lsit table th, .list table td {
+            border: 1px solid #000;
+        }
+    </style>
 </head>
 <body>
     <h1> 관리자 회원 관리</h1>
+    <div>
+        <a href="/admin/admin/main.do"> 관리자 메인 </a>
+        |
+        <a href="/admin/member/list.do"> 회원 관리 </a>
+        |
+        <a href="#"> 카테고리 관리 </a>
+        |
+        <a href="#"> 강의 관리 </a>
+        |
+        <a href="/member/logout"> 로그아웃 </a>
+        <dr/>
+    </div>
 
-        <div>
-            <a href="/admin/admin/main.do"> 관리자 메인 </a>
-            |
-            <a href="/admin/member/list.do"> 회원 관리 </a>
-            |
-            <a href="#"> 카테고리 관리 </a>
-            |
-            <a href="#"> 강의 관리 </a>
-            |
-            <a href="/member/logout"> 로그아웃 </a>
+    <div class="lsit">
+        <table>
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>
+                        아이디(이메일)
+                    </th>
+                    <th>
+                        이름
+                    </th>
+                    <th>
+                        연락처
+                    </th>
+                    <th>
+                        이메일 인증 여부
+                    </th>
+                    <th>
+                        가입일
+                    </th>
+                    <th>
+                        관리자 여부
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td th:text="${x.userId}">education.leochoi@gmail.com</td>
+                    <td th:text="${x.userName}">홍길동</td>
+                    <td th:text="${x.phone}">010-1111-2222</td>
+                    <td>
+                        <p th:if="${x.emailAuthYN}">Y</p>
+                        <p th:if="${x.emailAuthYN eq false}">N</p>
+                    </td>
+                    <td>
+                        <p th:text="${x.regDt}">2025.07.14</p>
+                    </td>
+                    <td>
+                        <p th:if="${x.adminYn}">Y</p>
+                        <p th:if="${x.adminYn eq false}">N</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-        </div>
-        <hr/>
+    </div>
+
 
 </body>
 </html>
