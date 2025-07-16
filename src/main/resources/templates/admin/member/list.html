@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>관리자 화면</title>
@@ -8,11 +8,9 @@
             width: 100%;
             border-collapse: collapse;
         }
-
         .lsit table th, .list table td {
             border: 1px solid #000;
         }
-
         .search-form {
             position: relative;
             padding: 5px 0 10px 0;
@@ -24,7 +22,6 @@
             height: 20px;
             float: right;
         }
-
         .pager {
             margin-top: 10px;
             text-align: center;
@@ -37,19 +34,7 @@
 </head>
 <body>
     <h1> 관리자 회원 관리</h1>
-    <div>
-        <a href="/admin/admin/main.do"> 관리자 메인 </a>
-        |
-        <a href="/admin/member/list.do"> 회원 관리 </a>
-        |
-        <a href="#"> 카테고리 관리 </a>
-        |
-        <a href="#"> 강의 관리 </a>
-        |
-        <a href="/member/logout"> 로그아웃 </a>
-        <dr/>
-        <hr/>
-    </div>
+    <div th:replace="fragments/layout.html :: fragment-admin-body-menu"></div>
 
     <div class="lsit">
 
@@ -73,7 +58,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>NO</th>
+                    <th> NO </th>
                     <th>
                         아이디(이메일)
                     </th>
