@@ -1,12 +1,10 @@
 package com.zerobase.fastlms.admin.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 public class MemberDto {
 
     String userId;
@@ -23,4 +21,8 @@ public class MemberDto {
     LocalDateTime resetPasswordLimitDt;
 
     boolean adminYn;
+
+    // 추가 컬럼
+    long totalCount;
+    long seq;
 }
