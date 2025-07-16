@@ -28,7 +28,7 @@ public class MailComponents {
 
         boolean result = false;
 
-        MimeMessagePreparator  msg = new MimeMessagePreparator() {
+        MimeMessagePreparator msg = new MimeMessagePreparator() {
 
             @Override
             public void prepare(MimeMessage mimeMessage) throws Exception {
@@ -42,7 +42,7 @@ public class MailComponents {
         try {
             javaMailSender.send(msg);
             result = true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
