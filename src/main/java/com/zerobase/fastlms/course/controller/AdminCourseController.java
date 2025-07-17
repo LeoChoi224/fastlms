@@ -76,7 +76,7 @@ public class AdminCourseController extends BaseController {
         return "admin/course/add";
     }
 
-    @PostMapping("/add.do")
+    @PostMapping(value = {"/add.do", "edit.do"})
     public String addSubmit(Model model,
                             HttpServletRequest request,
                             CourseInput parameter
@@ -101,5 +101,15 @@ public class AdminCourseController extends BaseController {
         return "redirect:/admin/course/list.do";
     }
 
+    @PostMapping("/delete.do")
+    public String del(Model model,
+                            HttpServletRequest request,
+                            CourseInput parameter
+    ) {
+        boolean result = courseService.del(parameter.getIdList());
+
+
+        return "redirect:/admin/course/list.do";
+    }
 
 }

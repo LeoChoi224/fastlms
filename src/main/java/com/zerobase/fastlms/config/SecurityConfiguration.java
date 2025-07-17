@@ -26,6 +26,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http.headers().frameOptions().sameOrigin();
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
