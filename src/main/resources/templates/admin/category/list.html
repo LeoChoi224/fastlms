@@ -27,14 +27,14 @@
         $(document).ready(function () {
 
             $('form[name=deleteForm]').on('submit', function () {
-                if (!confirm(`카테고리를 삭제하시겠습니까?`)) {
+                if (!confirm('카테고리를 삭제하시겠습니까?')) {
                     return false;
                 }
             });
 
-            $(`button.update-button`).on('click', function () {
+            $('button.update-button').on('click', function () {
 
-                if(!confirm(`카테고리를 수정하시겠습니까?`)) {
+                if(!confirm('카테고리를 수정하시겠습니까?')) {
                     return false;
                 }
 

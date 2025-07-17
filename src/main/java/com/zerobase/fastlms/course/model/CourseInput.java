@@ -15,4 +15,7 @@ public class CourseInput {
     long salePrice;
     String saleEndDtText;
 
+    // 삭제를 위한 속성
+     String idList;
+
 }
