@@ -106,9 +106,9 @@
                     <th>
                         <input id="selectAll" type="checkbox" th:value="${x.id}" />
                     </th>
-                    <th> ID </th>
+                    <th> NO </th>
                     <th>
-                        카테고리명
+                        강좌명
                     </th>
                     <th>
                         등록일
@@ -116,6 +116,7 @@
                 </tr>
             </thead>
             <tbody id="dataList">
+
                 <tr th:each="x : ${list}">
                     <th>
                         <input type="checkbox" th:value="${x.id}" />
