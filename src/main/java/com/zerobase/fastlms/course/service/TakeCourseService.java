@@ -18,5 +18,8 @@ public interface TakeCourseService {
      */
     ServiceResult updateStatus(long id, String status);
 
-
+    /**
+     * 내 수강내역 목록
+     */
+    List<TakeCourseDto> myCourse(String userId);
 }
