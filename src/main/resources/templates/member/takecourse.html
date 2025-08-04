@@ -24,14 +24,37 @@
 
             $('.row-buttons button').on('click', function () {
 
-                var id = $(this).closest('div').find('input[name=id]').val();
+                var id = $(this).val();
 
                 var msg = '수강취소 처리 하시겠습니까?';
                 if (!confirm(msg)) {
                     return false;
                 }
 
+                var url = 'api/member/course/cancel.api';
+                var parameter = {
+                    takeCourseId: id
+                };
+                axios.post(url, parameter).then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
 
+                    response.data = response.data || {};
+                    response.data.header = response.data.header || {};
+
+                    if (!response.data.header.result) {
+                        alert(response.data.header.message);
+                        return false;
+                    }
+
+                    alert(' 강좌가 정상적으로 취소되었습니다. ');
+                    location.reload()
+
+                }).catch(function (err) {
+                    console.log(err);
+                });
+
+                return false;
 
             });
 
@@ -89,8 +112,7 @@
                 </td>
                 <td>
                     <div class="row-buttons" th:if="${x.status eq 'REQ'}">
-                        <input type="hidden" name="id" th:value="${x.id}">
-                        <button type="button">수강취소 처리</button>
+                        <button type="button" th:value="${x.id}">수강취소 처리</button>
                     </div>
                 </td>
 
