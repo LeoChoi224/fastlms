@@ -47,7 +47,7 @@
 
     <div class="detail">
 
-        <form id="submitForm" method="post">
+        <form id="submitForm" method="post" enctype="multipart/form-data">
             <table>
                 <tbody>
                     <tr>
@@ -124,6 +124,14 @@
                         </td>
                     </tr>
 
+                    <tr>
+                        <th>
+                            첨부파일
+                        </th>
+                        <tb>
+                            <input type="file" name="file"/>
+                        </tb>
+                    </tr>
 
                 </tbody>
             </table>
